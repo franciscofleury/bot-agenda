@@ -12,7 +12,6 @@ from firebase_admin import credentials, firestore
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
 
-
 db = firestore.client()
 
 
@@ -41,7 +40,7 @@ async def limpar(context):
 @client.command(name ='prazo')
 async def prazo(context):
     dever  = context.message.content[7:]
-    restante = (deveres[dever] - datetime.datetime.today()).days +1
+    restante = (deveres[dever].replace(tzinfo=None) - datetime.datetime.today()).days +1
     await context.message.channel.send('RESTAM '+str(restante)+' DIAS PARA O PRAZO FINAL.')
 
 @client.command(name ='add')
