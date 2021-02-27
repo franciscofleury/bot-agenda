@@ -41,7 +41,7 @@ async def limpar(context):
 @client.command(name ='prazo')
 async def prazo(context):
     dever  = context.message.content[7:]
-    restante = (deveres[dever] - datetime.date.today()).days
+    restante = (deveres[dever] - datetime.datetime.today()).days +1
     await context.message.channel.send('RESTAM '+str(restante)+' DIAS PARA O PRAZO FINAL.')
 
 @client.command(name ='add')
