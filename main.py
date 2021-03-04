@@ -1,12 +1,12 @@
-deveres = {}
+
 
 import discord
 import asyncio
 from discord.ext import commands
-import pandas as pd
 import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
+
 #intents = discord.Intents.all()
 
 cred = credentials.Certificate('./turma-cred.json')
@@ -14,11 +14,10 @@ default_app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-
 def agendaBackup():
     db.collection('AGENDA').document('Agenda').set(deveres)
 
-client = commands.Bot(command_prefix='?')
+client = commands.Bot(command_prefix='!')
 
 
 
@@ -34,37 +33,39 @@ token = read_token()
 @client.command(name = 'clear')
 async def limpar(context):
     deveres.clear()
+    agendaBackup()
     await  context.message.channel.send("A agenda foi limpa!")
-
-
-@client.command(name ='prazo')
-async def prazo(context):
-    dever  = context.message.content[7:]
-    restante = (deveres[dever].replace(tzinfo=None) - datetime.datetime.today()).days +1
-    await context.message.channel.send('RESTAM '+str(restante)+' DIAS PARA O PRAZO FINAL.')
 
 @client.command(name ='add')
 async def add(context):
-    dever_last = context.message.content.find(' * ')
-    dever = context.message.content[5:dever_last]
-    
-    if dever_last != -1:
-        prazo = context.message.content[dever_last+3:]
-        dia = int(prazo[0:2])
+    getAgenda()
+    msg = context.message.content
+    dever_last = msg.find(' * ')
+    dever = msg[5:dever_last]
+    new_msg = msg[dever_last+3:]
+    plat = new_msg[:new_msg.find(' * ')]
+    new_2_msg = new_msg[new_msg.find(' * ')+3:]
+    materia = new_2_msg[:new_2_msg.find(' * ')]
+    new_3_msg = new_2_msg[new_2_msg.find(' * ')+3:]
+
+    if dever_last != -1 and new_msg.find(' * ') != -1 and new_2_msg.find(' * ') != -1:
+        prazo = new_3_msg
+        # dia = int(prazo[0:2])
         
-        mes = int(prazo[3:5])
+        # mes = int(prazo[3:5])
         
-        ano = int(prazo[6:10])
+        # ano = int(prazo[6:10])
         
-        deveres[dever] = datetime.datetime(ano,mes,dia)
+        deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':plat,'dataEnd': prazo}
         await context.message.channel.send('ITEM ADICIONADO COM SUCESSO!')
         agendaBackup()
     else:
-        await context.message.channel.send('POR FAVOR INSIRA UMA DATA')
+        await context.message.channel.send('POR FAVOR USE O FORMATO !ADD DEVER * PLATAFORMA * MATERIA * DATA')
 
 
 @client.command(name ='del')
 async def delete(context):
+    getAgenda()
     elemento = context.message.content[5:]
     try:
         deveres.pop(elemento)
@@ -76,13 +77,12 @@ async def delete(context):
     
 @client.command(name = 'agenda')
 async def lista(context):
-    
+    getAgenda()
     if len(deveres) > 0:
-        await context.message.channel.send('AGENDA:\n')
-        agenda_string = ''
+        emb = discord.Embed(title='Agenda')
         for key, value in deveres.items():
-            agenda_string += key + '  ---->'+f'{value.day}/{value.month}/{value.year}\n'
-        await context.message.channel.send(agenda_string)
+            emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+        await context.message.channel.send(embed=emb)
     else:
         await context.message.channel.send("Não há deveres na agenda")
 @client.command(name = 'calendario')
@@ -122,8 +122,10 @@ async def calendario(context):
 def getAgenda():
     doc = db.collection('AGENDA').document('Agenda').get()
     if doc.exists:
+
         global deveres
         deveres = doc.to_dict()
+        
     else:
         print('nao')
 
