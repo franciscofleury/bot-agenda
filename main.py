@@ -17,7 +17,7 @@ db = firestore.client()
 def agendaBackup():
     db.collection('AGENDA').document('Agenda').set(deveres)
 
-client = commands.Bot(command_prefix='?')
+client = commands.Bot(command_prefix='!')
 
 
 
@@ -78,10 +78,19 @@ async def delete(context):
 @client.command(name = 'agenda')
 async def lista(context):
     getAgenda()
+    hasFilter = False
+    if len(context.message.content) >8:
+        hasFilter = True
+        filtro = context.message.content[8:]
     if len(deveres) > 0:
         emb = discord.Embed(title='Agenda')
         for key, value in deveres.items():
-            emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+            if hasFilter:
+                
+                if value['plataforma'].lower() == filtro:
+                    emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+            else:
+                emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
         await context.message.channel.send(embed=emb)
     else:
         await context.message.channel.send("Não há deveres na agenda")
