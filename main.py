@@ -8,7 +8,6 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 #intents = discord.Intents.all()
-
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
 
@@ -60,7 +59,7 @@ async def add(context):
         await context.message.channel.send('ITEM ADICIONADO COM SUCESSO!')
         agendaBackup()
     else:
-        await context.message.channel.send('POR FAVOR USE O FORMATO !ADD DEVER * PLATAFORMA * MATERIA * DATA')
+        await context.message.channel.send('POR FAVOR USE O FORMATO ?ADD DEVER * PLATAFORMA * MATERIA * DATA')
 
 
 @client.command(name ='del')
@@ -81,7 +80,7 @@ async def lista(context):
     hasFilter = False
     if len(context.message.content) >8:
         hasFilter = True
-        filtro = context.message.content[8:]
+        filtro = context.message.content[8:].lower()
     if len(deveres) > 0:
         emb = discord.Embed(title='Agenda')
         for key, value in deveres.items():
