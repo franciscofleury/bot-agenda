@@ -92,13 +92,13 @@ async def lista(context):
         teste_deveres = transDever(deveres)
         new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
-        for key, value in new_deveres.items():
+        for key, value in new_deveres:
             if hasFilter:
                 
                 if value['plataforma'].lower() == filtro:
-                    emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+                    emb.add_field(name='**{}**'.format(value['nome']), value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
             else:
-                emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+                emb.add_field(name='**{}**'.format(value['nome']), value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
         await context.message.channel.send(embed=emb)
     else:
         await context.message.channel.send("Não há deveres na agenda")
