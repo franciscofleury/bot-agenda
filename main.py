@@ -89,7 +89,7 @@ async def lista(context):
         hasFilter = True
         filtro = context.message.content[8:].lower()
     if len(deveres) > 0:
-        teste_deveres = transDever(deveres)
+        teste_deveres = transDever(deveres).items()
         new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
         print(new_deveres)
