@@ -29,7 +29,7 @@ def read_token():
 
 token = read_token()
 def transDever(lista):
-    for i in lista:
+    for key, i in lista.items():
         print(i)
         print(i['dataEnd'])
         print(i['dataEnd'][0:2])
