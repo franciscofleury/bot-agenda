@@ -35,7 +35,7 @@ def transDever(lista):
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
         if newNumber in counting_list:
             counting_list.append(newNumber)
-            new_lista[newNumber+(counting_list(newNumber)*0.01)] = i
+            new_lista[newNumber+(counting_list.count(newNumber)*0.01)] = i
         else:
             counting_list.append(newNumber)
             new_lista[newNumber] = i
