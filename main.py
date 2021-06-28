@@ -92,6 +92,7 @@ async def lista(context):
         teste_deveres = transDever(deveres)
         new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
+        print(new_deveres)
         for key, tu in enumerate(new_deveres):
             print(key)
             print(tu)
