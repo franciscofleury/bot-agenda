@@ -32,7 +32,7 @@ def transDever(lista):
     for key, i in lista.items():
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
         print(newNumber)
-        key['dataValue'] = newNumber
+        lista[key]['dataValue'] = newNumber
     print(lista)
     return lista
 @client.command(name = 'clear')
