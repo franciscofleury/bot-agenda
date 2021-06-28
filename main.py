@@ -30,7 +30,7 @@ def read_token():
 token = read_token()
 def transDever(lista):
     for i in lista:
-        newNumber = int(i['dataEnd'][:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:])* 10000)
+        newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
         i['dataValue'] = newNumber
     return lista
 @client.command(name = 'clear')
