@@ -30,11 +30,14 @@ def read_token():
 token = read_token()
 def transDever(lista):
     new_lista = {}
+    counting_list = []
     for key, i in lista.items():
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
-        if newNumber in new_lista:
-            new_lista[newNumber+0.01] = i
+        if newNumber in counting_list:
+            counting_list.append(newNumber)
+            new_lista[newNumber+(counting_list(newNumber)*0.01)] = i
         else:
+            counting_list.append(newNumber)
             new_lista[newNumber] = i
     
     return new_lista
