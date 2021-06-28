@@ -30,10 +30,8 @@ def read_token():
 token = read_token()
 def transDever(lista):
     for key, i in lista.items():
-        print(i)
-        print(i['dataEnd'])
-        print(i['dataEnd'][0:2])
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
+        print(newNumber)
         i['dataValue'] = newNumber
     return lista
 @client.command(name = 'clear')
@@ -90,7 +88,7 @@ async def lista(context):
         filtro = context.message.content[8:].lower()
     if len(deveres) > 0:
         teste_deveres = transDever(deveres)
-        new_deveres = sorted(teste_deveres,key=lambda x: x['dataValue'])
+        new_deveres = sorted(teste_deveres.items(),key=lambda x: x['dataValue'])
         emb = discord.Embed(title='Agenda')
         for key, value in new_deveres.items():
             if hasFilter:
