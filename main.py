@@ -32,8 +32,10 @@ def transDever(lista):
     new_lista = {}
     for key, i in lista.items():
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
-        
-        new_lista[newNumber] = i
+        if newNumber in new_lista:
+            new_lista[newNumber+0.01] = i
+        else:
+            new_lista[newNumber] = i
     
     return new_lista
 @client.command(name = 'clear')
