@@ -32,9 +32,9 @@ def transDever(lista):
     new_lista = {}
     for key, i in lista.items():
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
-        print(newNumber)
+        
         new_lista[newNumber] = i
-    print(new_lista)
+    
     return new_lista
 @client.command(name = 'clear')
 async def limpar(context):
@@ -93,6 +93,8 @@ async def lista(context):
         new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
         for key, tu in enumerate(new_deveres):
+            print(key)
+            print(tu)
             value = tu[1]
             if hasFilter:
                 
