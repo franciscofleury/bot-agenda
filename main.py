@@ -30,6 +30,9 @@ def read_token():
 token = read_token()
 def transDever(lista):
     for i in lista:
+        print(i)
+        print(i['dataEnd'])
+        print(i['dataEnd'][0:2])
         newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
         i['dataValue'] = newNumber
     return lista
