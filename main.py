@@ -92,7 +92,7 @@ async def lista(context):
         teste_deveres = transDever(deveres)
         new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
-        for key, value in new_deveres:
+        for key, value in enumerate(new_deveres):
             if hasFilter:
                 
                 if value['plataforma'].lower() == filtro:
