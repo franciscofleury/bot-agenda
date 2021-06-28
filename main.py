@@ -82,8 +82,9 @@ async def lista(context):
         hasFilter = True
         filtro = context.message.content[8:].lower()
     if len(deveres) > 0:
+        new_deveres = sorted(deveres,key=lambda x: x['dataEnd'])
         emb = discord.Embed(title='Agenda')
-        for key, value in deveres.items():
+        for key, value in new_deveres.items():
             if hasFilter:
                 
                 if value['plataforma'].lower() == filtro:
