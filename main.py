@@ -21,7 +21,7 @@ client = commands.Bot(command_prefix='?')
 
 
 
-calendario_escola = {'SEGUNDA':['Física 2','Física 2','Biologia 1','Biologia 1','Matemática 1','Matemática 1'],'TERÇA':['Literatura','Matemática 2','Matemática 2','Redação','Biologia 2','Biologia 2'],'QUARTA':['Química 2','Química 2','Literatura','Português','Espanhol','Sociologia'],'QUINTA':['Geografia','Geografia','História 2','Biologia 2','História 2','Português','Geografia','Química 1','Redação','Física 1'],'SEXTA':['SOE','Matemática 2','Matemática 2','Física 1','Física 1','Filosofia'],'SABADO':['Química 1','Química 1','Inglês','História 1','História 1','História 2']}
+calendario_escola = {'SEGUNDA':['Física DIONE','Física DIONE','Inglês','Biologia FRED','Matemática SÉRGIO','Matemática SÉRGIO'],'TERÇA':['Biologia LEO','História KAPA','Literatura','Matemática Rapha','Redação','Química Jeosafá'],'QUARTA':['Português','Espanhol','Biologia LEO','Biologia LEO','Literatura','Química RODRIGO'],'QUINTA':['SOE','Geografia','Geografia','Português','História KAPA','História KAPA','Espanhol','Química RODRIGO','Redação','Física DIONE'],'SEXTA':['Química JEOSAFÁ','Matemática RAPHA','Matemática RAPHA','Física CADU','Física CADU','História GAUI'],'SABADO':['Sociologia','Química RODRIGO','Filosofia','Matemática RAPHA','História GAUI','Biologia FRED']}
 def read_token():
     with open("token.txt",'r') as f:
         lines = f.readlines()
