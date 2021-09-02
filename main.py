@@ -1,12 +1,13 @@
 
 
+from ast import literal_eval
 import discord
 import asyncio
 from discord.ext import commands
 import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
-
+from discord_components import *
 #intents = discord.Intents.all()
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -48,28 +49,45 @@ async def limpar(context):
     await  context.message.channel.send("A agenda foi limpa!")
 
 @client.command(name ='add')
-async def add(context):
+async def add(context, dever='none', prazo='none'):
     getAgenda()
-    msg = context.message.content
-    dever_last = msg.find(' * ')
-    dever = msg[5:dever_last]
-    new_msg = msg[dever_last+3:]
-    plat = new_msg[:new_msg.find(' * ')]
-    new_2_msg = new_msg[new_msg.find(' * ')+3:]
-    materia = new_2_msg[:new_2_msg.find(' * ')]
-    new_3_msg = new_2_msg[new_2_msg.find(' * ')+3:]
-
-    if dever_last != -1 and new_msg.find(' * ') != -1 and new_2_msg.find(' * ') != -1:
-        prazo = new_3_msg
-        # dia = int(prazo[0:2])
-        
-        # mes = int(prazo[3:5])
-        
-        # ano = int(prazo[6:10])
-        
-        deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':plat,'dataEnd': prazo}
-        await context.message.channel.send('ITEM ADICIONADO COM SUCESSO!')
-        agendaBackup()
+    print(dever)
+    print(prazo)
+    materia = 'none'
+    plat = 'none'
+    if dever !='none' and prazo != 'none':
+        await context.send('Insira a matéria e a plataforma:',components=[Select(placeholder='Matéria',options=[SelectOption(label='Matemática 1',value='Matemática 1'),SelectOption(label='Matemática 2',value='Matemática 2'),SelectOption(label='Matemática 3', value='Matemática 3'),SelectOption(label='Física 1', value='Física 1'),SelectOption(label='Física 2', value='Física 2'),SelectOption(label='Geografia', value='Geografia'),SelectOption(label='História 1', value='História 1'),SelectOption(label='História 2', value='História 2'),SelectOption(label='Filosofia', value='Filosofia'),SelectOption(label='Sociologia', value='Sociologia'),SelectOption(label='Português', value='Português'),SelectOption(label='Redação', value='Redação'),SelectOption(label='Inglês', value='Inglês'),SelectOption(label='Literatura', value='Literatura'),SelectOption(label='Biologia 1', value='Biologia 1'),SelectOption(label='Biologia 2', value='Biologia 2'),SelectOption(label='Química 1', value='Química 1'),SelectOption(label='Química 2', value='Química 2')], custom_id='materia'),Select(placeholder='Plataforma',options=[SelectOption(label='Geekie',value='Geekie'),SelectOption(label='Teams',value='Teams'),SelectOption(label='Rede y', value='Rede y')], custom_id='plataforma'),
+        Button(style=ButtonStyle.green, label="CONFIRMAR", id="go")])
+        while True:
+            select1 = await client.wait_for('select_option',check=None)
+            if select1.custom_id == 'materia':
+                materia = select1.values[0]
+                print(materia)
+                await select1.respond(type=7, content='Insira a plataforma:')
+                break
+            elif select1.custom_id == 'plataforma':
+                plat = select1.values[0]
+                print(plat)
+                await select1.respond(type=7, content='Insira a matéria:')
+                break
+        while True:
+            select2 = await client.wait_for('select_option',check=None)
+            if select2.custom_id == 'materia':
+                materia = select2.values[0]
+                print(materia)
+                await select2.respond(type=7,content='Confirme!')
+                break
+            elif select2.custom_id == 'plataforma':
+                plat = select2.values[0]
+                print(plat)
+                await select2.respond(type=7, content='Confirme!')
+                break
+        while True:
+            button = await client.wait_for('button_click',check=None)
+            deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':plat,'dataEnd': prazo}
+            await button.send('DEVER ADICIONADO COM SUCESSO!', ephemeral=True)
+        #await select1.send('ITEM ADICIONADO COM SUCESSO!',ephemeral=True)
+            agendaBackup()
     else:
         await context.message.channel.send('POR FAVOR USE O FORMATO ?ADD DEVER * PLATAFORMA * MATERIA * DATA')
 
@@ -158,6 +176,7 @@ def getAgenda():
 
 @client.event
 async def on_ready():
+    DiscordComponents(client)
     print('Informações básicas:')
     print('Nome do bot: {0}'.format(client.user.name))
     print('Id: {0}'.format(client.user.id))
