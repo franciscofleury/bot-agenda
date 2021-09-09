@@ -21,7 +21,7 @@ db = firestore.client()
 def agendaBackup():
     db.collection('AGENDA').document('Agenda').set(deveres)
 
-client = commands.Bot(command_prefix='&')
+client = commands.Bot(command_prefix='?')
 
 
 
