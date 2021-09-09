@@ -8,7 +8,11 @@ import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 from discord_components import *
+import requests
+import json
 #intents = discord.Intents.all()
+materias = {10000000070032108:'Redação',10000000070032146:'Química 1',10000000070032155:'Português',10000000070032149:'Matemática 1',10000000070032125:'Química 2'}
+
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
 
@@ -17,7 +21,7 @@ db = firestore.client()
 def agendaBackup():
     db.collection('AGENDA').document('Agenda').set(deveres)
 
-client = commands.Bot(command_prefix='?')
+client = commands.Bot(command_prefix='&')
 
 
 
@@ -162,7 +166,19 @@ async def calendario(context):
             for tempo in value:
                 to_print += tempo+'\n'
             await context.message.channel.send(to_print)
-
+@client.command(name='update')
+async def update(context):
+    output_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    main = requests.get('https://platform.api.geekielab.com.br/activities/for-me?min_date=2021-07-24T15:00:00.000Z&max_date=2022-01-01T00:00:00.000Z&include_future_activities=true&_token=iuYaEUHAhGXLLfZKlfVHTHuCOVKsFjyEwoBINFYK&_platform=web&_app_ver=21.35.0')
+    resp = json.loads(main.content)
+    for act in resp['results']:
+        if act['end_date'] > output_date:
+            dever = act['title']
+            prazo = str(act['end_date'][8:10])+'/'+str(act['end_date'][5:7])+'/'+str(act['end_date'][0:4])
+            materia = materias[int(act['author_id'])]
+            deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':'Geekie','dataEnd': prazo}
+    await context.message.channel.send('DEVERES ADICIONADOS COM SUCESSO!')
+    agendaBackup()
 def getAgenda():
     doc = db.collection('AGENDA').document('Agenda').get()
     if doc.exists:
