@@ -11,7 +11,7 @@ from discord_components import *
 import requests
 import json
 #intents = discord.Intents.all()
-materias = {10000000070032108:'Redação',10000000070032146:'Química 1',10000000070032155:'Português',10000000070032149:'Matemática 1',10000000070032125:'Química 2'}
+materias = {10000000070032108:'Redação',10000000070032146:'Química 1',10000000070032155:'Português',10000000070032149:'Matemática 1',10000000070032125:'Química 2',10000000070032144:'Matemática 2',10000000070198658:'Biologia 1',10000000070032143:'História 2',10000000070032139:'Geografia',10000000070032119:'Biologia 2',10000000070032129:'História 1',10000000070032111:'Física 2',10000000070032117:'Física 1',10000000070032116:'Literatura'}
 
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
