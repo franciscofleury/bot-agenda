@@ -1,13 +1,17 @@
 
 
+from ast import literal_eval
 import discord
 import asyncio
 from discord.ext import commands
 import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
-
+from discord_components import *
+import requests
+import json
 #intents = discord.Intents.all()
+materias = {10000000070032108:'Redação',10000000070032146:'Química 1',10000000070032155:'Português',10000000070032149:'Matemática 1',10000000070032125:'Química 2'}
 
 cred = credentials.Certificate('./turma-cred.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -22,14 +26,26 @@ client = commands.Bot(command_prefix='?')
 
 
 
-calendario_escola = {'SEGUNDA':['Física 2','Física 2','Biologia 1','Biologia 1','Matemática 1','Matemática 1'],'TERÇA':['Literatura','Matemática 2','Matemática 2','Redação','Biologia 2','Biologia 2'],'QUARTA':['Química 2','Química 2','Literatura','Português','Espanhol','Sociologia'],'QUINTA':['Geografia','Geografia','História 2','Biologia 2','História 2','Português','Geografia','Química 1','Redação','Física 1'],'SEXTA':['SOE','Matemática 2','Matemática 2','Física 1','Física 1','Filosofia'],'SABADO':['Química 1','Química 1','Inglês','História 1','História 1','História 2']}
+calendario_escola = {'SEGUNDA':['Física DIONE','Física DIONE','Inglês','Biologia FRED','Matemática SÉRGIO','Matemática SÉRGIO'],'TERÇA':['Biologia LEO','História KAPA','Literatura','Matemática Rapha','Redação','Química Jeosafá'],'QUARTA':['Português','Espanhol','Biologia LEO','Biologia LEO','Literatura','Química RODRIGO'],'QUINTA':['SOE','Geografia','Geografia','Português','História KAPA','História KAPA','Espanhol','Química RODRIGO','Redação','Física DIONE'],'SEXTA':['Química JEOSAFÁ','Matemática RAPHA','Matemática RAPHA','Física CADU','Física CADU','História GAUI'],'SABADO':['Sociologia','Química RODRIGO','Filosofia','Matemática RAPHA','História GAUI','Biologia FRED']}
 def read_token():
     with open("token.txt",'r') as f:
         lines = f.readlines()
         return lines[0].strip()
 
 token = read_token()
-
+def transDever(lista):
+    new_lista = {}
+    counting_list = []
+    for key, i in lista.items():
+        newNumber = int(i['dataEnd'][0:2]) + (int(i['dataEnd'][3:5]) * 100) + (int(i['dataEnd'][6:10])* 10000)
+        if newNumber in counting_list:
+            counting_list.append(newNumber)
+            new_lista[newNumber+(counting_list.count(newNumber)*0.01)] = i
+        else:
+            counting_list.append(newNumber)
+            new_lista[newNumber] = i
+    
+    return new_lista
 @client.command(name = 'clear')
 async def limpar(context):
     deveres.clear()
@@ -37,30 +53,47 @@ async def limpar(context):
     await  context.message.channel.send("A agenda foi limpa!")
 
 @client.command(name ='add')
-async def add(context):
+async def add(context, dever='none', prazo='none'):
     getAgenda()
-    msg = context.message.content
-    dever_last = msg.find(' * ')
-    dever = msg[5:dever_last]
-    new_msg = msg[dever_last+3:]
-    plat = new_msg[:new_msg.find(' * ')]
-    new_2_msg = new_msg[new_msg.find(' * ')+3:]
-    materia = new_2_msg[:new_2_msg.find(' * ')]
-    new_3_msg = new_2_msg[new_2_msg.find(' * ')+3:]
-
-    if dever_last != -1 and new_msg.find(' * ') != -1 and new_2_msg.find(' * ') != -1:
-        prazo = new_3_msg
-        # dia = int(prazo[0:2])
-        
-        # mes = int(prazo[3:5])
-        
-        # ano = int(prazo[6:10])
-        
-        deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':plat,'dataEnd': prazo}
-        await context.message.channel.send('ITEM ADICIONADO COM SUCESSO!')
-        agendaBackup()
+    print(dever)
+    print(prazo)
+    materia = 'none'
+    plat = 'none'
+    if dever !='none' and prazo != 'none':
+        await context.send('Insira a matéria e a plataforma:',components=[Select(placeholder='Matéria',options=[SelectOption(label='Matemática 1',value='Matemática 1'),SelectOption(label='Matemática 2',value='Matemática 2'),SelectOption(label='Matemática 3', value='Matemática 3'),SelectOption(label='Física 1', value='Física 1'),SelectOption(label='Física 2', value='Física 2'),SelectOption(label='Geografia', value='Geografia'),SelectOption(label='História 1', value='História 1'),SelectOption(label='História 2', value='História 2'),SelectOption(label='Filosofia', value='Filosofia'),SelectOption(label='Sociologia', value='Sociologia'),SelectOption(label='Português', value='Português'),SelectOption(label='Redação', value='Redação'),SelectOption(label='Inglês', value='Inglês'),SelectOption(label='Literatura', value='Literatura'),SelectOption(label='Biologia 1', value='Biologia 1'),SelectOption(label='Biologia 2', value='Biologia 2'),SelectOption(label='Química 1', value='Química 1'),SelectOption(label='Química 2', value='Química 2')], custom_id='materia'),Select(placeholder='Plataforma',options=[SelectOption(label='Geekie',value='Geekie'),SelectOption(label='Teams',value='Teams'),SelectOption(label='Rede y', value='Rede y')], custom_id='plataforma'),
+        Button(style=ButtonStyle.green, label="CONFIRMAR", id="go")])
+        while True:
+            select1 = await client.wait_for('select_option',check=None)
+            if select1.custom_id == 'materia':
+                materia = select1.values[0]
+                print(materia)
+                await select1.respond(type=7, content='Insira a plataforma:')
+                break
+            elif select1.custom_id == 'plataforma':
+                plat = select1.values[0]
+                print(plat)
+                await select1.respond(type=7, content='Insira a matéria:')
+                break
+        while True:
+            select2 = await client.wait_for('select_option',check=None)
+            if select2.custom_id == 'materia':
+                materia = select2.values[0]
+                print(materia)
+                await select2.respond(type=7,content='Confirme!')
+                break
+            elif select2.custom_id == 'plataforma':
+                plat = select2.values[0]
+                print(plat)
+                await select2.respond(type=7, content='Confirme!')
+                break
+        while True:
+            button = await client.wait_for('button_click',check=None)
+            deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':plat,'dataEnd': prazo}
+            await button.send('DEVER ADICIONADO COM SUCESSO!', ephemeral=True)
+        #await select1.send('ITEM ADICIONADO COM SUCESSO!',ephemeral=True)
+            agendaBackup()
     else:
-        await context.message.channel.send('POR FAVOR USE O FORMATO !ADD DEVER * PLATAFORMA * MATERIA * DATA')
+        await context.message.channel.send('POR FAVOR USE O FORMATO ?ADD DEVER * PLATAFORMA * MATERIA * DATA')
 
 
 @client.command(name ='del')
@@ -78,10 +111,25 @@ async def delete(context):
 @client.command(name = 'agenda')
 async def lista(context):
     getAgenda()
+    hasFilter = False
+    if len(context.message.content) >8:
+        hasFilter = True
+        filtro = context.message.content[8:].lower()
     if len(deveres) > 0:
+        teste_deveres = transDever(deveres).items()
+        new_deveres = sorted(teste_deveres)
         emb = discord.Embed(title='Agenda')
-        for key, value in deveres.items():
-            emb.add_field(name=f'**{key}**', value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+        print(new_deveres)
+        for key, tu in enumerate(new_deveres):
+            print(key)
+            print(tu)
+            value = tu[1]
+            if hasFilter:
+                
+                if value['plataforma'].lower() == filtro:
+                    emb.add_field(name='**{}**'.format(value['nome']), value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
+            else:
+                emb.add_field(name='**{}**'.format(value['nome']), value="> plataforma: {}\n> materia: {}\n> data: {}".format(value['plataforma'],value['materia'],value['dataEnd']),inline=False)
         await context.message.channel.send(embed=emb)
     else:
         await context.message.channel.send("Não há deveres na agenda")
@@ -118,7 +166,19 @@ async def calendario(context):
             for tempo in value:
                 to_print += tempo+'\n'
             await context.message.channel.send(to_print)
-
+@client.command(name='update')
+async def update(context):
+    output_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    main = requests.get('https://platform.api.geekielab.com.br/activities/for-me?min_date=2021-07-24T15:00:00.000Z&max_date=2022-01-01T00:00:00.000Z&include_future_activities=true&_token=iuYaEUHAhGXLLfZKlfVHTHuCOVKsFjyEwoBINFYK&_platform=web&_app_ver=21.35.0')
+    resp = json.loads(main.content)
+    for act in resp['results']:
+        if act['end_date'] > output_date:
+            dever = act['title']
+            prazo = str(act['end_date'][8:10])+'/'+str(act['end_date'][5:7])+'/'+str(act['end_date'][0:4])
+            materia = materias[int(act['author_id'])]
+            deveres[dever] = {'nome':dever,'materia':materia, 'plataforma':'Geekie','dataEnd': prazo}
+    await context.message.channel.send('DEVERES ADICIONADOS COM SUCESSO!')
+    agendaBackup()
 def getAgenda():
     doc = db.collection('AGENDA').document('Agenda').get()
     if doc.exists:
@@ -132,6 +192,7 @@ def getAgenda():
 
 @client.event
 async def on_ready():
+    DiscordComponents(client)
     print('Informações básicas:')
     print('Nome do bot: {0}'.format(client.user.name))
     print('Id: {0}'.format(client.user.id))
